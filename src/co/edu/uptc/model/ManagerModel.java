@@ -18,7 +18,7 @@ public class ManagerModel implements Contract.Model {
         return client;
     }
     public void initConnection(){
-        String[] args = {"client", "192.168.20.25", "9999"};
+        String[] args = {"client", "10.200.3.150", "9999"};
         String type = args[0];
         if (type.equalsIgnoreCase("client")){
             client = new Client(args[1], Integer.parseInt(args[2]), this);
