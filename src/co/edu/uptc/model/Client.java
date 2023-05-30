@@ -42,6 +42,7 @@ public class Client {
     }
 
     public void sendToView(String info){
+        System.out.println("Img");
         String[] coordenates = info.split(",");
         Rectangle rectangle = new Rectangle(Integer.parseInt(coordenates[0]), Integer.parseInt(coordenates[1]), 25,25);
         model.getPresenter().paintRectangle(rectangle);
