@@ -21,11 +21,16 @@ public class ClientPanel extends JPanel {
     public void paint(Graphics g){
         super.paint(g);
         Graphics2D graphics2D = (Graphics2D) g;
-        graphics2D.draw(rectangle);
+        graphics2D.setColor(new Color(color));
+        System.out.println("color -> " + color);
+        graphics2D.fillRect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
     }
 
-    public void paintRectangle(Rectangle rectangle){
+    private int color;
+
+    public void paintRectangle(Rectangle rectangle, int color){
         this.repaint();
+        this.color = color;
         this.rectangle = rectangle;
     }
 }

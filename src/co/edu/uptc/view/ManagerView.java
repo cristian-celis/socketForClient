@@ -9,8 +9,6 @@ import java.awt.*;
 public class ManagerView extends JFrame implements Contract.View{
     private ClientPanel clientPanel;
     private Contract.Presenter presenter;
-    private JDialog acceptConnection;
-    private JButton accept;
 
     public ManagerView(Contract.Presenter presenter){
         this.presenter = presenter;
@@ -22,6 +20,13 @@ public class ManagerView extends JFrame implements Contract.View{
         this.setVisible(true);
     }
 
+    @Override
+    public void setInfoFrame(int x, int y, int width, int height, int color){
+        this.setSize(width, height);
+        this.setLocation(x, y);
+        this.setBackground(new Color(color));
+    }
+
     private void initComponents(){
         setLayout(new BorderLayout());
         clientPanel = new ClientPanel(this);
@@ -31,11 +36,7 @@ public class ManagerView extends JFrame implements Contract.View{
     }
 
     @Override
-    public void paintRectangle(Rectangle rectangle) {
-        clientPanel.paintRectangle(rectangle);
-    }
-
-    public Contract.Presenter getPresenter(){
-        return presenter;
+    public void paintRectangle(Rectangle rectangle, int color) {
+        clientPanel.paintRectangle(rectangle, color);
     }
 }

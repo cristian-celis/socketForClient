@@ -1,6 +1,6 @@
 package co.edu.uptc.model;
 
-import co.edu.uptc.pojo.InformationForImage;
+import co.edu.uptc.pojo.*;
 import com.google.gson.Gson;
 
 import javax.imageio.ImageIO;
@@ -29,20 +29,17 @@ public class Client {
     }
 
     public void receive() {
-        try{
+        try {
             Thread thread = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        int count = 0;
                         dataInputStream = new DataInputStream(connection.socket.getInputStream());
                         String info;
                         while (true) {
                             info = dataInputStream.readUTF();
                             System.out.println("Llego: " + info);
-                            //jsonToRectangle(info);
-                            jsonToImg(info, count);
-                            count++;
+                            jsonToRectangle(info);
                         }
                     } catch (SocketException e) {
                         System.out.println("Se desconecto -> " + e.getCause());
@@ -52,42 +49,79 @@ public class Client {
                 }
             };
             thread.start();
-        }catch (Exception e){
+        } catch (Exception e) {
         }
 
     }
 
-    private String totalInfo = "";
+    private void jsonToRectangle(String info) {
+        Information information = new Gson().fromJson(info, Information.class);
 
-    private void jsonToImg(String info, int count){
-        String amountTotalInfo = "";
-        if (count == 0){
-            String[] divideInfo = info.split("=");
-            amountTotalInfo = divideInfo[0];
-            System.out.println("tamaño divideInfo 1: " + divideInfo[1].length());
-            totalInfo = divideInfo[1];
-        }else{
-            totalInfo += info;
+        figureInformation figureInformation = information.getFigureInformation();
+        int color = figureInformation.getColor();
+
+        panelInformation panelInformation = information.getPanelInformation();
+        int panelColor = panelInformation.getColor();
+
+        frameInformation frameInformation = information.getFrameInformation();
+
+        int x = frameInformation.getX();
+        int y = frameInformation.getY();
+        int width = frameInformation.getWidth();
+        int height = frameInformation.getHeight();
+
+
+        int intRectangle = information.getFigureInformation().rectangle;
+        model.getPresenter().setInfoFrame(x, y, width, height, panelColor);
+        model.getPresenter().paintRectangle(getRectangle(intRectangle), color);
+    }
+
+    private Rectangle getRectangle(int numero) {
+        String binaryNum = Integer.toBinaryString(numero);
+        while (binaryNum.length() < 32) {
+            binaryNum = "0" + binaryNum;
         }
-        System.out.println("totalInfo lenght: " + totalInfo.length() + ", amountTotalInfor: " + amountTotalInfo);
-        if (totalInfo.length() == Integer.parseInt(amountTotalInfo)){
-            System.out.println("totalInfo: " + totalInfo);
-            System.out.println("Coincidio");
-            InformationForImage bytes = new Gson().fromJson(totalInfo, InformationForImage.class);
-            try{
-                BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes.getImgBytes()));
-                File file = new File("imagenGenerada.png");
-                ImageIO.write(image, "png", file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        String[] num = binaryNum.split("");
+        boolean ready = false;
+        String[] x = new String[10];
+        String[] y = new String[10];
+        String[] width = new String[6];
+        String[] height = new String[6];
+        String[] temporal = height;
+        int lastPosition = num.length - 1;
+        int count = 1;
+        while (!ready && lastPosition >= 0) {
+
+
+            for (int i = 0; i < temporal.length; i++) {
+                temporal[i] = num[lastPosition];
+                lastPosition--;
             }
+            switch (count) {
+                case 1 -> {
+                    height = temporal;
+                    temporal = width;
+                }
+                case 2 -> {
+                    width = temporal;
+                    temporal = y;
+                }
+                case 3 -> {
+                    y = temporal;
+                    temporal = x;
+                }
+                case 4 -> {
+                    x = temporal;
+                    ready = true;
+                }
+            }
+            count++;
         }
-    }
 
-    public void jsonToRectangle(String info) {
-        System.out.println("Img");
-        String[] coordenates = info.split(",");
-        Rectangle rectangle = new Rectangle(Integer.parseInt(coordenates[0]), Integer.parseInt(coordenates[1]), 25, 25);
-        model.getPresenter().paintRectangle(rectangle);
+        int numX = Integer.parseInt(new StringBuilder(String.join("", x)).reverse().toString(), 2);
+        int numY = Integer.parseInt(new StringBuilder(String.join("", y)).reverse().toString(), 2);
+        int numWidth = Integer.parseInt(new StringBuilder(String.join("", width)).reverse().toString(), 2);
+        int numHeigth = Integer.parseInt(new StringBuilder(String.join("", height)).reverse().toString(), 2);
+        return new Rectangle(numX, numY, numWidth, numHeigth);
     }
 }
