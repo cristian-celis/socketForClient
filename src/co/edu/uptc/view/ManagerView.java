@@ -9,11 +9,13 @@ import java.awt.*;
 public class ManagerView extends JFrame implements Contract.View{
     private ClientPanel clientPanel;
     private Contract.Presenter presenter;
+    private JDialog acceptConnection;
+    private JButton accept;
 
     public ManagerView(Contract.Presenter presenter){
         this.presenter = presenter;
         this.setTitle("Client");
-        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setSize(700, 700);
         initComponents();
@@ -25,6 +27,7 @@ public class ManagerView extends JFrame implements Contract.View{
         clientPanel = new ClientPanel(this);
         clientPanel.setPreferredSize(new Dimension(700,700));
         this.add(clientPanel, BorderLayout.CENTER);
+        presenter.receive();
     }
 
     @Override

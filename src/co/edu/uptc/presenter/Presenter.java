@@ -12,10 +12,14 @@ public class Presenter implements Contract.Presenter{
     public Presenter(){
         model = new ManagerModel(this);
         view = new ManagerView(this);
-        model.getClient().receive();
     }
     @Override
     public void paintRectangle(Rectangle rectangle) {
         view.paintRectangle(rectangle);
+    }
+
+    @Override
+    public void receive() {
+        model.receive();
     }
 }
